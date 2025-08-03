@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temazos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        h1 {
+            color: white;
+            font-size: 3.5rem;
+            margin-bottom: 40px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            font-weight: bold;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-screen {
+            position: relative;
+            z-index: 1;
+        }
+
+        .song-info {
+            display: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            margin: 15px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(238, 90, 36, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(238, 90, 36, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-show {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            box-shadow: 0 8px 25px rgba(68, 160, 141, 0.4);
+        }
+
+        .btn-show:hover {
+            box-shadow: 0 12px 35px rgba(68, 160, 141, 0.6);
+        }
+
+        .btn-back {
+            background: linear-gradient(45deg, #a55eea, #8e44ad);
+            box-shadow: 0 8px 25px rgba(142, 68, 173, 0.4);
+            margin-top: 30px;
+        }
+
+        .btn-back:hover {
+            box-shadow: 0 12px 35px rgba(142, 68, 173, 0.6);
+        }
+
+        .song-details {
+            color: white;
+            margin: 30px 0;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .song-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .song-artist {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+            color: #ffeaa7;
+        }
+
+        .song-year {
+            font-size: 1.4rem;
+            opacity: 0.8;
+            color: #ddd;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .floating-notes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .note {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 2rem;
+            animation: float 6s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        #youtube-player {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 40px 25px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .btn {
+                padding: 15px 25px;
+                font-size: 1rem;
+                margin: 10px;
+            }
+            
+            .song-title {
+                font-size: 1.8rem;
+            }
+            
+            .song-artist {
+                font-size: 1.4rem;
+            }
+            
+            .song-year {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-notes">
+        <div class="note" style="left: 10%; animation-delay: 0s;">♪</div>
+        <div class="note" style="left: 20%; animation-delay: 1s;">♫</div>
+        <div class="note" style="left: 30%; animation-delay: 2s;">♪</div>
+        <div class="note" style="left: 40%; animation-delay: 3s;">♬</div>
+        <div class="note" style="left: 50%; animation-delay: 4s;">♪</div>
+        <div class="note" style="left: 60%; animation-delay: 5s;">♫</div>
+        <div class="note" style="left: 70%; animation-delay: 1.5s;">♪</div>
+        <div class="note" style="left: 80%; animation-delay: 2.5s;">♬</div>
+        <div class="note" style="left: 90%; animation-delay: 3.5s;">♪</div>
+    </div>
+
+    <div class="container">
+        <h1>Temazos</h1>
+        
+        <div class="main-screen" id="mainScreen">
+            <button class="btn" onclick="reproducirCancion()">Reproducir</button>
+            <button class="btn btn-show" onclick="mostrarCancion()">Mostrar</button>
+        </div>
+
+        <div class="song-info" id="songInfo">
+            <div class="song-details">
+                <div class="song-title" id="songTitle"></div>
+                <div class="song-artist" id="songArtist"></div>
+                <div class="song-year" id="songYear"></div>
+            </div>
+            <button class="btn btn-back" onclick="volverInicio()">Volver al Inicio</button>
+        </div>
+    </div>
+
+    <div id="youtube-player"></div>
+
+    <script>
+        const canciones = [
+            {id: "JGwWNGJdvx8", titulo: "Shape of You", artista: "Ed Sheeran", año: "2017"},
+            {id: "RgKAFK5djSk", titulo: "See You Again", artista: "Charlie Puth", año: "2015"},
+            {id: "OPf0YbXqDm0", titulo: "Uptown Funk", artista: "Mark Ronson", año: "2014"},
+            {id: "k85mRPqvMbE", titulo: "Axel F", artista: "Crazy Frog", año: "2005"},
+            {id: "09R8_2nJtjg", titulo: "Sugar", artista: "Maroon 5", año: "2015"},
+            {id: "fRh_vgS2dFE", titulo: "Sorry", artista: "Justin Bieber", año: "2015"},
+            {id: "CevxZvSJLk8", titulo: "Roar", artista: "Katy Perry", año: "2013"},
+            {id: "hT_nvWreIhg", titulo: "Counting Stars", artista: "OneRepublic", año: "2013"},
+            {id: "lp-EO5I60KA", titulo: "Thinking Out Loud", artista: "Ed Sheeran", año: "2014"},
+            {id: "FzG4uDgje3M", titulo: "Dame Tu Cosita", artista: "El Chombo", año: "2018"},
+            {id: "YQHsXMglC9A", titulo: "Hello", artista: "Adele", año: "2015"},
+            {id: "nfWlot6h_JM", titulo: "Shake It Off", artista: "Taylor Swift", año: "2014"},
+            {id: "0KSOMA3QBU0", titulo: "Dark Horse", artista: "Juicy J", año: "2013"},
+            {id: "YqeW9_5kURI", titulo: "Lean On", artista: "DJ Snake", año: "2015"},
+            {id: "b8I-7Wk_Vbc", titulo: "Bailando", artista: "Gente de Zona", año: "2014"},
+            {id: "aJOTlE1K90k", titulo: "Girls Like You", artista: "Cardi B", año: "2018"},
+            {id: "RBumgq5yVrA", titulo: "Let Her Go", artista: "Passenger", año: "2012"},
+            {id: "APHgDFRpCi0", titulo: "Mi Gente", artista: "Willy William", año: "2017"},
+            {id: "2Vv-BfVoq4g", titulo: "Perfect", artista: "Ed Sheeran", año: "2017"},
+            {id: "pRpeEdMmmQ0", titulo: "Waka Waka (This Time for Africa)", artista: "Freshlyground", año: "2010"},
+            {id: "e-ORhEE9VVg", titulo: "Blank Space", artista: "Taylor Swift", año: "2014"},
+            {id: "PT2_F-1esPk", titulo: "Closer", artista: "Halsey", año: "2016"}
+        ];
+
+        let currentSong = null;
+        let player;
+        let apiLoaded = false;
+
+        // Cargar la API de YouTube de forma dinámica
+        function loadYouTubeAPI() {
+            if (!window.YT) {
+                const tag = document.createElement('script');
+                tag.src = 'https://www.youtube.com/iframe_api';
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            }
+        }
+
+        // Esta función es llamada automáticamente cuando la API está lista
+        window.onYouTubeIframeAPIReady = function() {
+            player = new YT.Player('youtube-player', {
+                height: '1',
+                width: '1',
+                playerVars: {
+                    'playsinline': 1,
+                    'controls': 0,
+                    'showinfo': 0,
+                    'rel': 0,
+                    'iv_load_policy': 3,
+                    'modestbranding': 1,
+                    'autoplay': 0
+                },
+                events: {
+                    'onReady': function() {
+                        apiLoaded = true;
+                        console.log('YouTube player está listo');
+                    },
+                    'onError': function(event) {
+                        console.log('Error en YouTube player:', event.data);
+                    }
+                }
+            });
+        };
+
+        function getRandomSong() {
+            const randomIndex = Math.floor(Math.random() * canciones.length);
+            return canciones[randomIndex];
+        }
+
+        function reproducirCancion() {
+            currentSong = getRandomSong();
+            console.log('Intentando reproducir:', currentSong.titulo);
+            
+            if (!apiLoaded || !player) {
+                // Si la API no está cargada, abrimos directamente en YouTube
+                const url = `https://www.youtube.com/watch?v=${currentSong.id}`;
+                window.open(url, '_blank');
+                return;
+            }
+            
+            try {
+                player.loadVideoById({
+                    'videoId': currentSong.id,
+                    'startSeconds': 0
+                });
+                
+                // Pequeño delay para asegurar que el video se carga
+                setTimeout(() => {
+                    player.playVideo();
+                }, 500);
+                
+            } catch (error) {
+                console.log('Error reproduciendo:', error);
+                // Fallback: abrir en nueva pestaña
+                const url = `https://www.youtube.com/watch?v=${currentSong.id}`;
+                window.open(url, '_blank');
+            }
+        }
+
+        function mostrarCancion() {
+            if (!currentSong) {
+                currentSong = getRandomSong();
+            }
+            
+            document.getElementById('songTitle').textContent = currentSong.titulo;
+            document.getElementById('songArtist').textContent = currentSong.artista;
+            document.getElementById('songYear').textContent = currentSong.año;
+            
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('songInfo').style.display = 'block';
+        }
+
+        function volverInicio() {
+            document.getElementById('mainScreen').style.display = 'block';
+            document.getElementById('songInfo').style.display = 'none';
+            
+            if (player && player.stopVideo) {
+                try {
+                    player.stopVideo();
+                } catch (error) {
+                    console.log('Error deteniendo video:', error);
+                }
+            }
+        }
+
+        // Cargar la API cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadYouTubeAPI();
+        });
+    </script>
+</body>
+</html>
